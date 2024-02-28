@@ -13,17 +13,20 @@ def telegram_bot(token):
     @bot.message_handler(commands=['start'])
     def get_user_question(message):
         markup_inline = types.InlineKeyboardMarkup()
+        markup_reply = types.ReplyKeyboardMarkup()
         item_yes = types.InlineKeyboardButton(text='YES', callback_data='yes')
+        item_no = types.InlineKeyboardButton(text='NO', callback_data='no')
 
-        markup_inline.add(item_yes)
+        markup_inline.add(item_yes, item_no)
+
         bot.send_message(message.chat.id, 'Hi, would you like to see the latest news?',
-                         reply_markup=markup_inline)
+                        reply_markup=markup_inline)
 
 
     @bot.callback_query_handler(func = lambda call: True)
     def start_message(call):
         if call.data == 'yes':
-            bot.send_message(call.message.chat.id, "Hi, here's the popular news lately")
+            bot.send_message(call.message.chat.id, "Here's the popular news lately")
 
             url = ('https://newsapi.org/v2/top-headlines?'
                    'country=us&'
@@ -47,16 +50,8 @@ def telegram_bot(token):
                 print(ex)
                 bot.send_message(call.message.chat.id, 'Check valid of date')
         else:
-            bot.send_message(call.chat.id, 'ok')
+            bot.send_message(call.message.chat.id, 'ok')
 
-
-    @bot.message_handler(commands=['start_bot'])
-    def start_bot(message):
-        markup = types.ReplyKeyboardMarkup()
-        item_start = types.KeyboardButton('/start')
-        markup.row(item_start)
-
-        bot.send_message(message.chat.id, 'Bot started!', reply_markup=markup)
 
     bot.polling()
 
